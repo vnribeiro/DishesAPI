@@ -8,7 +8,6 @@ public class DishesDbContext : DbContext
     public DbSet<Dish> Dishes { get; set; } = null!;
     public DbSet<Ingredient> Ingredients { get; set; } = null!;
 
-
     public DishesDbContext(DbContextOptions<DishesDbContext> options)
         : base(options) {}
 
