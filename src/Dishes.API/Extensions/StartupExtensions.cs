@@ -1,4 +1,6 @@
-﻿using Asp.Versioning.ApiExplorer;
+﻿using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Dishes.API.Endpoints.V1;
 
 namespace Dishes.API.Extensions;
 
@@ -55,7 +57,27 @@ public static class StartupExtensions
             });
         }
 
+        app.MapEndpoints();
         app.UseHttpsRedirection();
+        return app;
+    }
+
+    private static WebApplication MapEndpoints(this WebApplication app)
+    {
+        // Define the API version
+        var apiVersion = app
+        .NewApiVersionSet()
+        .HasApiVersion(new ApiVersion(1.0))
+        .Build();
+
+        // Map the API version to the endpoints
+        var versionedGroup = app
+        .MapGroup("/api/v{apiVersion:apiVersion}")
+        .WithApiVersionSet(apiVersion);
+        
+        versionedGroup
+        .MapDishesEndpoints();
+
         return app;
     }
 }
