@@ -17,20 +17,4 @@ public static class DishesEndpoints
 
         return app;
     }
-
-     public static IEndpointRouteBuilder MapDishesEndpointsV2(this IEndpointRouteBuilder app)
-    {
-    
-        app.MapGet("dishes", async (CancellationToken cancellationToken) =>
-        {
-            return Results.Ok(new { Message = "Products from V2" });
-        });
-
-        app.MapGet("dishes/{dishId:Guid}", async (Guid dishId, CancellationToken cancellationToken) =>
-        {
-            return Results.Ok(new { Message = $"Product from V2 with id {dishId}" });
-        });
-
-        return app;
-    }
 }

@@ -1,16 +1,21 @@
 ﻿using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Dishes.API.Endpoints;
 
 namespace Dishes.API.Extensions;
 
 public static class StartupExtensions
 {
+    /// <summary>
+    /// Configures services for the application.
+    /// Adds persistence services, CORS policy, API versioning, Swagger, and environment settings.
+    /// </summary>
+    /// <param name="builder">The WebApplicationBuilder instance.</param>
+    /// <returns>The configured WebApplication instance.</returns>
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
-    {       
+    {
         builder.Services
         .AddPersistenceServices(builder.Configuration);
-  
+
         // Add CORS
         builder.Services
             .AddCors(options =>
@@ -31,10 +36,16 @@ public static class StartupExtensions
 
         builder
         .ConfigureEnvironmentSettings();
-        
+
         return builder.Build();
     }
 
+    /// <summary>
+    /// Configures the HTTP request pipeline for the application.
+    /// Enables CORS, Swagger, and maps endpoints.
+    /// </summary>
+    /// <param name="app">The WebApplication instance.</param>
+    /// <returns>The configured WebApplication instance.</returns>
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         // Enable CORS
@@ -49,32 +60,12 @@ public static class StartupExtensions
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dishes API V1");
-            });         
+            });
         }
 
         // Map the endpoints
         app.MapEndpoints();
         app.UseHttpsRedirection();
-        return app;
-    }
-
-    public static WebApplication MapEndpoints(this WebApplication app)
-    {
-        // Define the API version
-        var apiVersionSet = app
-        .NewApiVersionSet()
-        .HasApiVersion(new ApiVersion(1.0))
-        .Build();
-
-        // Map the API version to the endpoints
-        var versionedGroup = app
-        .MapGroup("/api/v{apiVersion:apiVersion}")
-        .WithApiVersionSet(apiVersionSet);
-        
-        // Map the endpoints V1
-        versionedGroup
-        .MapDishesEndpoints();
-
         return app;
     }
 }
