@@ -1,3 +1,4 @@
+using Asp.Versioning.ApiExplorer;
 using Dishes.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -6,26 +6,12 @@ namespace Dishes.API.Extensions;
 
 public static class PresentationServiceRegistrationExtensions
 {
-    public static WebApplicationBuilder AddPresentationServices(this WebApplicationBuilder builder)
-    {
-        // Configure API versioning and Swagger
-        builder.Services
-            .ConfigureApiVersioning()
-            .ConfigureSwagger();
-
-        // Configure environment settings
-        builder
-            .ConfigureEnvironmentSettings();
-
-        return builder;
-    }
-
     /// <summary>
     /// Configures API versioning for the application.
     /// </summary>
     /// <param name="services">The service collection to add the API versioning services to.</param>
     /// <returns>The updated service collection.</returns>
-    private static IServiceCollection ConfigureApiVersioning(this IServiceCollection services)
+    public static IServiceCollection ConfigureApiVersioning(this IServiceCollection services)
     {
         services.AddApiVersioning(options =>
         {
@@ -46,7 +32,7 @@ public static class PresentationServiceRegistrationExtensions
     /// </summary>
     /// <param name="services">The service collection to add the Swagger services to.</param>
     /// <returns>The updated service collection.</returns>
-    private static IServiceCollection ConfigureSwagger(this IServiceCollection services)
+    public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
     {
         services.AddSwaggerGen(c =>
         {
@@ -102,7 +88,7 @@ public static class PresentationServiceRegistrationExtensions
     /// </summary>
     /// <param name="builder">The web application builder to configure.</param>
     /// <returns>The updated web application builder.</returns>
-    private static WebApplicationBuilder ConfigureEnvironmentSettings(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder ConfigureEnvironmentSettings(this WebApplicationBuilder builder)
     {
         builder.Configuration
             .AddJsonFile("appsettings.json", true, true)

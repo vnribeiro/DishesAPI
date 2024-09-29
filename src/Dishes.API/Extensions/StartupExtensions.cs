@@ -1,17 +1,13 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using Dishes.API.Endpoints.V1;
+using Dishes.API.Endpoints;
 
 namespace Dishes.API.Extensions;
 
 public static class StartupExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
-    {
-        // Add Services Layers
-        builder
-        .AddPresentationServices();
-       
+    {       
         builder.Services
         .AddPersistenceServices(builder.Configuration);
   
@@ -28,8 +24,14 @@ public static class StartupExtensions
                         .AllowAnyHeader()
                         .AllowCredentials()));
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services
+        .AddEndpointsApiExplorer()
+        .ConfigureApiVersioning()
+        .ConfigureSwagger();
+
+        builder
+        .ConfigureEnvironmentSettings();
+        
         return builder.Build();
     }
 
@@ -43,40 +45,48 @@ public static class StartupExtensions
         {
             app.UseSwagger();
 
-            // Configure SwaggerUI to show all APIS versions
+            // Configure SwaggerUI to show all API versions
             app.UseSwaggerUI(options =>
             {
-                var provider = app.Services
-                    .GetRequiredService<IApiVersionDescriptionProvider>();
-
-                foreach (var description in provider.ApiVersionDescriptions)
-                {
-                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                        $"Dishes API {description.GroupName.ToUpperInvariant()}");
-                }
-            });
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dishes API V1");
+                options.SwaggerEndpoint("/swagger/v2/swagger.json", "Dishes API V2");
+            });         
         }
 
+        // Map the endpoints
         app.MapEndpoints();
         app.UseHttpsRedirection();
         return app;
     }
 
-    private static WebApplication MapEndpoints(this WebApplication app)
+    public static WebApplication MapEndpoints(this WebApplication app)
     {
         // Define the API version
-        var apiVersion = app
+        var apiVersionV1 = app
         .NewApiVersionSet()
         .HasApiVersion(new ApiVersion(1.0))
         .Build();
 
+        var apiVersionV2 = app
+        .NewApiVersionSet()
+        .HasApiVersion(new ApiVersion(2.0))
+        .Build();
+
         // Map the API version to the endpoints
-        var versionedGroup = app
+        var versionedGroupV1 = app
         .MapGroup("/api/v{apiVersion:apiVersion}")
-        .WithApiVersionSet(apiVersion);
+        .WithApiVersionSet(apiVersionV1);
         
-        versionedGroup
+        var versionedGroupV2 = app
+        .MapGroup("/api/v{apiVersion:apiVersion}")
+        .WithApiVersionSet(apiVersionV2);
+        
+        // Map the endpoints V1
+        versionedGroupV1
         .MapDishesEndpoints();
+
+        versionedGroupV2
+        .MapDishesEndpointsV2();
 
         return app;
     }
