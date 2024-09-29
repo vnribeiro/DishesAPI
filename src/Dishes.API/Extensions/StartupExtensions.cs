@@ -49,7 +49,6 @@ public static class StartupExtensions
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dishes API V1");
-                options.SwaggerEndpoint("/swagger/v2/swagger.json", "Dishes API V2");
             });         
         }
 
@@ -62,31 +61,19 @@ public static class StartupExtensions
     public static WebApplication MapEndpoints(this WebApplication app)
     {
         // Define the API version
-        var apiVersionV1 = app
+        var apiVersionSet = app
         .NewApiVersionSet()
         .HasApiVersion(new ApiVersion(1.0))
         .Build();
 
-        var apiVersionV2 = app
-        .NewApiVersionSet()
-        .HasApiVersion(new ApiVersion(2.0))
-        .Build();
-
         // Map the API version to the endpoints
-        var versionedGroupV1 = app
+        var versionedGroup = app
         .MapGroup("/api/v{apiVersion:apiVersion}")
-        .WithApiVersionSet(apiVersionV1);
-        
-        var versionedGroupV2 = app
-        .MapGroup("/api/v{apiVersion:apiVersion}")
-        .WithApiVersionSet(apiVersionV2);
+        .WithApiVersionSet(apiVersionSet);
         
         // Map the endpoints V1
-        versionedGroupV1
+        versionedGroup
         .MapDishesEndpoints();
-
-        versionedGroupV2
-        .MapDishesEndpointsV2();
 
         return app;
     }
